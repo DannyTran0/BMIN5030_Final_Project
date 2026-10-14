@@ -1,7 +1,7 @@
 ---
 title: "Your Title"
 subtitle: "BMIN5030 Final Project"
-author: "FirstName LastName"
+author: "Danny Tran"
 format: html
 editor: visual
 number-sections: true
@@ -16,6 +16,18 @@ Use this template to complete your project throughout the course. Your Final Pro
 
 Give a brief a description of your project and its goal(s), what data you are using to complete it, and what two faculty/staff in different fields you have spoken to about your project with a brief summary of what you learned from each person. Include a link to your final project GitHub repository.
 
+The goal of this project is to...
+
+understand the underlying factors that could be causing periodontal disease, with a focus on smoking as the predictor factor.
+
+Kei Katsura:
+
+Person #2:
+
+<https://r-packages.io/datasets/teeth>
+
+<https://github.com/DannyTran0/BMIN5030_Final_Project>
+
 ## Introduction {#sec-introduction}
 
 Describe the problem addressed, its significance, and some background to motivate the problem. This should extend what is in the @sec-overview.
@@ -25,6 +37,20 @@ Explain why your problem is interdisciplinary, what fields can contribute to its
 ## Methods {#sec-methods}
 
 Describe the data used and general methodological approach used to address the problem described in the @sec-introduction. Subsequently, incorporate full R code necessary to retrieve and clean data, and perform analysis. Be sure to include a description of code so that others (including your future self) can understand what you are doing and why.
+
+```{r}
+#Installation of required packages
+install.packages("sensitivitymult")
+install.packages("ForCausality")
+
+#placeholder
+library(sensitivitymult)
+library(ForCausality)
+
+#placeholder
+dataset<-teeth
+ds1<-Periodontal_df
+```
 
 ## Results {#sec-results}
 
