@@ -14,35 +14,11 @@ Use this template to complete your project throughout the course. Your Final Pro
 
 ## Overview {#sec-overview}
 
-Give a brief a description of your project and its goal(s), what data you are using to complete it, and what two faculty/staff in different fields you have spoken to about your project with a brief summary of what you learned from each person. Include a link to your final project GitHub repository.
+Tobacco usage has been found to be linked to numerous medical diseases and conditions, ranging from lung cancer to poor oral health \[1\]. The primary objective of this project is to explore the potential association that smoking has on periodontal disease among adults. It will include tobacco use trends in Philadelphia to highlight public health awareness on. The data that will be used for this project comes from a 2011-12 NHANES database on the periodontic aspect of oral health through the R package “ForCausality”.
 
-The primary objective of this project is to explore the potential association that smoking has on periodontal disease among adults. Specifically, it aims to look at whether teeth in the upper jaw are more prone to periodontal disease compared to the lower jaw. The data that will be used for this project comes from a 2011-12 NHANES database on the periodontal aspect of oral health. 
-
-This project was aided by Dr. Kei Katsura and Dr. \[\]
+Dr. Kei Katsura, a Post Doc at CHOP, and Dr. Mohammad Abukar, a professor at Temple University Dental School, were both consulted to aid with identifying potential topics and the types of analyses to be done with the dataset.
 
 Repo Link: <https://github.com/DannyTran0/BMIN5030_Final_Project>
-
-Maintaining oral health is an essential factor to preventing a build-up of dental plaque
-
-Smoking has been known to be a factor in causing numerous diseases which ranges from lung cancer to cardiovascular disease \[1\]. But
-
-However,
-
-Therefore, the goal of this project is to explore how smoking...
-
-Specifically, the aim is to
-
-explore the underlying factors that could be causing periodontal disease, with a focus on smoking as the predictor factor.
-
-The data that will be used for this project comes from a 2011-12 NHANES
-
-Kei Katsura, a Post Doc at CHOP, was consulted... Person 2, placeholder, was also consulted
-
-Person #2:
-
-<https://r-packages.io/datasets/teeth>
-
-https://www.kaggle.com/datasets/svyatoslavbelkovsky/periodontal-disease-and-smoking/data
 
 ## Introduction {#sec-introduction}
 
@@ -50,28 +26,29 @@ Describe the problem addressed, its significance, and some background to motivat
 
 Explain why your problem is interdisciplinary, what fields can contribute to its understanding, and incorporate background related to what you learned from meeting with faculty/staff.
 
+Maintaining oral health is an essential factor to preventing a build-up of dental plaque
+
 Periodontal disease is caused by a bacterial infection that...
+
+I also learned a great deal about how secondhand inhalation of smoking can cause an increased risk in oral health problems \[Dr. Kei Katsura\].
 
 ## Methods {#sec-methods}
 
 Describe the data used and general methodological approach used to address the problem described in the @sec-introduction. Subsequently, incorporate full R code necessary to retrieve and clean data, and perform analysis. Be sure to include a description of code so that others (including your future self) can understand what you are doing and why.
 
 ```{r}
-library(tidyverse)
-library(haven)
+install.packages("ForCausality")
 ```
 
 ```{r}
-#Installation of required packages
-install.packages("sensitivitymult")
-install.packages("ForCausality")
-
-#placeholder
-library(sensitivitymult)
 library(ForCausality)
+library(tidyverse)
+library(ggplot2)
+library(sf) #Might consider using it for mapping
+```
 
-#placeholder
-dataset<-teeth
+```{r}
+#Dataset
 ds1<-Periodontal_df
 ```
 
@@ -89,7 +66,7 @@ This the conclusion. The @sec-results can be invoked here.
 
 ## References
 
-\[1\]
+\[1\] U.S. Food & Drug Administration (2024). How Tobacco Use Affects Oral Health. <https://www.fda.gov/tobacco-products/health-effects-tobacco-use/how-tobacco-use-affects-oral-health>
 
 \[2\]
 
