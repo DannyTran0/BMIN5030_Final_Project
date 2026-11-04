@@ -14,50 +14,59 @@ Use this template to complete your project throughout the course. Your Final Pro
 
 ## Overview {#sec-overview}
 
-Tobacco usage has been found to be linked to numerous medical diseases and conditions, one of which is poor oral health \[1\]. The primary objective of this project is to explore the potential association that smoking has on periodontal disease among adults. It will include tobacco use trends in Philadelphia to highlight public health awareness on the dangers of smoking. The data that will be used for this project comes from a 2011-12 NHANES database on the periodontal aspect of oral health through the R package “ForCausality”.
+Tobacco usage has been found to be linked to numerous medical diseases and conditions, one of which is poor oral health \[1\]. The primary objective of this project is to explore the potential association that smoking has on periodontal disease among adults. It will include tobacco use trends in Philadelphia to highlight public health awareness at the local level. The data that will be used for this project comes from a 2011-12 NHANES database on the periodontic aspect of oral health through the R package “ForCausality”.
 
-Dr. Kei Katsura, a Post Doc at CHOP, and Dr. Mohammad Abukar, a professor at Temple University School of Dentistry, were both consulted to aid with identifying potential topics and the types of analyses to be done with the dataset.
+Dr. Kei Katsura, a Post Doc at CHOP, and Dr. Mohammad Abukar, a professor at Temple University Dental School, were both consulted to aid with identifying potential topics and the types of analyses to be done with the dataset. I also learned a great deal about how secondhand inhalation of smoking can cause an increased risk in oral health problems.
 
 Repo Link: <https://github.com/DannyTran0/BMIN5030_Final_Project>
 
 ## Introduction {#sec-introduction}
 
-Describe the problem addressed, its significance, and some background to motivate the problem. This should extend what is in the @sec-overview.
+Periodontal disease is a broad condition where bacterial infections and/or inflammatory responses affect gum and bone tissues surrounding and supporting teeth \[2\]. While it can be preventable, it can be destructive if left untreated \[2\]. There are numerous factors that can cause periodontal disease, but this project will focus on the use of tobacco in smoking. Due to the nature of tobacco being burned while smoking, it has been linked to negatively impacting oral health among other health complications \[1\]. Non-smokers are also affected through secondhand smoke exposure which increases risk of health complications especially among children and the elderly \[3\]. 
 
-Explain why your problem is interdisciplinary, what fields can contribute to its understanding, and incorporate background related to what you learned from meeting with faculty/staff.
+Despite trends in the smoking rate decreasing nationally between 2012-2022 among adults, Philadelphia has consistently remained above the national rate \[4\]. Public health support and resources are needed to educate the residents on the dangers of smoking. In turn, smokers would be able to find the help needed to quit smoking.
 
-Smoking is a large contributor to causing numerous medical diseases and conditions, ranging from various cancers like lung cancer to various teeth and oral problems like periodontal disease \[1\]. Periodontal disease is a broad condition where the gum and bone tissues that surround and support the teeth are infected and/or inflamed, potentially leading to destruction of tissues if left untreated \[2\]. 
+This project aims to explore the potential association between smoking and periodontal disease measurements among adults. In particular, it will explore how various demographic factors, income, and the number of cigarettes smoked per day is correlated with causing periodontal disease. This is where the National Health and Nutrition Examination Survey (NHANES) data for 2011-12 comes into play to aid with the analysis. Additionally, it will examine tobacco use in Philadelphia to provide context on the local level with public health.
 
-Despite the smoking rate trends decreasing between 2012-2022 among adults, Philadelphia has consistently been above that trend rate, which is a major public health concern for the city not just for the smokers, but also those who do not smoke.
+The project is interdisciplinary as it connects various fields on the issue of smoking as a cause for periodontal disease, including dentistry, biomedical data science, public health, behavioral psychology, and sociology. As such, reaching out to experts in these fields is essential to understand the problem. The following experts were consulted:
 
-Maintaining oral health is an essential factor to preventing a build-up of dental plaque
+- Dr. Kei Katsura: During our conversations, she helped me with formulating and refining my research topic for the project while also describing how I could utilize the different variables to aid with analyzing the data. She had mentioned that due to the “race” variable being too broad, I should be cautious with the conclusions being made as it does not state other races.
 
-Periodontal disease is caused by a bacterial infection that...
-
-I also learned a great deal about how secondhand smoke exposure can cause an increased risk in oral health problems \[Dr. Kei Katsura\].
+- Dr. Mohammad Abukar: During our conversation, we discussed ways to go about analyzing the dataset, suggesting tying in how age, gender, race, and income could cause an individual to turn to smoking and subsequently getting periodontal disease. He also suggested the possibility that I use the analyzed data to apply it to the city of Philadelphia to see which areas are more prone to tobacco use and make a case for spreading awareness about smoking dangers.
 
 ## Methods {#sec-methods}
 
-Describe the data used and general methodological approach used to address the problem described in the @sec-introduction. Subsequently, incorporate full R code necessary to retrieve and clean data, and perform analysis. Be sure to include a description of code so that others (including your future self) can understand what you are doing and why.
+This project will utilize two datasets:
+
+- 2011-12 NHANES on oral health (periodontal)
+
+- Tobacco use in Philadelphia (currently looking for dataset)
+
+With the start of every R programming, it is important to install the right R packages for use. Below is code that automatically installs packages that were used in class along with the package “ForCausality” which contains the dataset that this project will be using.
 
 ```{r}
+#| eval: FALSE
+
 install.packages("ForCausality")
 ```
 
 placeholder
 
 ```{r}
+#| label: load-packages
+
 library(ForCausality)
 library(tidyverse)
 library(ggplot2)
 library(sf) #Might consider using it for mapping
+library(RColorBrewer)
 ```
 
 placeholder
 
 ```{r}
 #Dataset
-ds1<-Periodontal_df
+periodontal.data<-Periodontal_df
 ```
 
 placeholder
@@ -73,6 +82,7 @@ placeholder
 #Bivariate analysis then multivariate analysis
 #Static choropleth map on smoking in Philadelphia
 #Interactive map?
+
 ```
 
 placeholder
@@ -85,11 +95,11 @@ This the conclusion. The @sec-results can be invoked here.
 
 \[1\] U.S. Food & Drug Administration (2024). How Tobacco Use Affects Oral Health. <https://www.fda.gov/tobacco-products/health-effects-tobacco-use/how-tobacco-use-affects-oral-health>
 
-\[2\]
+\[2\] <https://www.cdc.gov/oral-health/about/gum-periodontal-disease.html>
 
-\[3\]
+\[3\] <https://www.cdc.gov/tobacco/about/index.html> 
 
-\[4\]
+\[4\] <https://www.phila.gov/media/20250114150429/CHARTe9v2a_Tobacco-Trends.pdf>
 
 \[5\]
 
