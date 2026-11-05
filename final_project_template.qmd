@@ -38,11 +38,11 @@ The project is interdisciplinary as it connects various fields on the issue of s
 
 This project will utilize two datasets:
 
-- 2011-12 NHANES on oral health (periodontal)
+- 2011-12 NHANES on oral health (periodontal) conducted by the Center for Disease Control and Prevention (CDC) to assess the relative health of the population
 
 - Tobacco use in Philadelphia (currently looking for dataset)
 
-With the start of every R programming, it is important to install the right R packages for use. Below is code that automatically installs packages that were used in class along with the package “ForCausality” which contains the dataset that this project will be using.
+With the start of every R programming, it is important to install the right R packages for use. Below is code that installs the package `ForCausality` which contains the primary dataset that this project will be using.
 
 ```{r}
 #| eval: FALSE
@@ -50,7 +50,7 @@ With the start of every R programming, it is important to install the right R pa
 install.packages("ForCausality")
 ```
 
-placeholder
+Including `ForCausality`, various other packages will be called to aid in analyzing and visualizing the data. After that, the `Periodontal_df` dataset will be stored in a variable called `periodontal.data`.
 
 ```{r}
 #| label: load-packages
@@ -58,15 +58,19 @@ placeholder
 library(ForCausality)
 library(tidyverse)
 library(ggplot2)
-library(sf) #Might consider using it for mapping
+library(sf)
 library(RColorBrewer)
 ```
-
-placeholder
 
 ```{r}
 #Dataset
 periodontal.data<-Periodontal_df
+```
+
+To start off, the data will need to be re-purposed. That is, several column names will need to be changed to better reflect the meaning of the data and
+
+```{r}
+
 ```
 
 placeholder
@@ -75,7 +79,7 @@ placeholder
 
 Describe your results and include relevant tables, plots, and code/comments used to obtain them. You may refer to the @sec-methods as needed. End with a brief conclusion of your findings related to the question you set out to address. You can include references if you'd like, but this is not required.
 
-placeholder
+Written below are currently initial ideas of what I will be doing (please stand by)
 
 ```{r}
 #Visual graphs
