@@ -52,6 +52,7 @@ install.packages("ForCausality")
 library(ForCausality)
 library(tidyverse)
 library(ggplot2)
+library(modelsummary)
 library(sf)
 library(RColorBrewer)
 library(tidycensus)
@@ -73,7 +74,7 @@ periodontal.data<-Periodontal_df
 head(periodontal.data)
 ```
 
-Despite the package providing processed data, most of it are vague and do not have much meaning. As such, it will be modified to provide proper meaning to the data, one example being the conversion of 0 and 1 from the gender variable to indicate male and female. Additionally, the majority of the variable names will be renamed.
+Despite the package providing processed data, most of it are vague and do not have much meaning. As such, it will be modified to provide proper meaning to the data, one example being the conversion of 0 and 1 from the gender variable to indicate male and female. Smoker status will also be converted and age will be categorized into various age groups. Additionally, the majority of the variable names will be renamed.
 
 ```{r}
 #Data modifications
@@ -125,7 +126,9 @@ head(smoking.data.2014)
 #Filters and selects relevant variables
 philly.smoking.2014<-smoking.data.2014 |>
   filter(StateAbbr=="PA", PlaceName=="Philadelphia") |>
-  select(StateAbbr,PlaceName,TractFIPS,CSMOKING_CrudePrev)
+  mutate(TractFIPS=str_pad(as.character(TractFIPS),
+                         width = 11)) |>
+  select(TractFIPS,CSMOKING_CrudePrev)
 
 #Variable meaning
 #StateAbbr: Abbreviation of U.S. state
@@ -146,13 +149,15 @@ philly.tract.2014<-tracts(state="PA",
   select(GEOID,geometry)
 
 #Merges the geospatial coordinates from the 2014 tract data into smoking data using GEOID
-philly.smoke.data.consolidation.2014<-philly.smoking.2014 |>
-  inner_join(philly.tract.2014,
-             by=c("TractFIPS"="GEOID"))
+philly.2014<-philly.tract.2014 |>
+  inner_join(philly.smoking.2014,
+             by=c("GEOID"="TractFIPS"))
 
 #Checks that everything has been correctly done
-head(philly.smoke.data.consolidation.2014)
-dim(philly.smoke.data.consolidation.2014)
+head(philly.2014)
+dim(philly.2014)
+
+class(philly.2014)
 ```
 
 ```{r}
@@ -165,6 +170,8 @@ head(smoking.data.2017)
 #Filters and selects relevant variables
 philly.smoking.2017<-smoking.data.2017 |>
   filter(StateAbbr=="PA", PlaceName=="Philadelphia") |>
+  mutate(TractFIPS=str_pad(as.character(TractFIPS),
+                           width = 11)) |>
   select(StateAbbr,PlaceName,TractFIPS,CSMOKING_CrudePrev)
   
 ##Checks that everything has been correctly done
@@ -180,13 +187,13 @@ philly.tract.2017<-tracts(state="PA",
   select(GEOID,geometry)
 
 #Merges the geospatial coordinates from the 2017 tract data into smoking data using GEOID
-philly.smoke.data.consolidation.2017<-philly.smoking.2017 |>
-  inner_join(philly.tract.2017,
-             by=c("TractFIPS"="GEOID"))
+philly.2017<-philly.tract.2017 |>
+  inner_join(philly.smoking.2017,
+             by=c("GEOID"="TractFIPS"))
 
 #Checks that everything has been correctly done
-head(philly.smoke.data.consolidation.2017)
-dim(philly.smoke.data.consolidation.2017)
+head(philly.2017)
+dim(philly.2017)
 ```
 
 Smoking prevalence data from 2014 and 2017 is taken and consolidated into its own table. A new column is added into the table in "philly.smoke.data.consolidation.2017" to show the change in smoking prevalence between 2014 and 2017.
@@ -196,7 +203,7 @@ Smoking prevalence data from 2014 and 2017 is taken and consolidated into its ow
 philly.smoke.change.2014<-philly.smoking.2014$CSMOKING_CrudePrev
 philly.smoke.change.2017<-philly.smoking.2017$CSMOKING_CrudePrev
 
-philly.smoke.data.consolidation.2017<- philly.smoke.data.consolidation.2017 |>
+philly.2017<-philly.2017 |>
 #Adds a new variable about a change in smoking prevalence between 2014 and 2017
   mutate(smoke.prevalence.change=philly.smoke.change.2017-philly.smoke.change.2014)
 ```
@@ -252,25 +259,126 @@ ggplot(smoker.education,aes(x=education,fill=smoker.status))+
   labs(x="Education Level",y="Number of Participants",title="Smoker status of participant based on education")+
   theme_bw()+
   theme(plot.title=element_text(hjust=0.5))
-#  scale_fill_manual(values=c("red","steelblue"))
 ```
+
+#### Bivariate and Multivariate Analysis between ...
+
+```{r}
+#Bivariable Analysis
+
+#Runs a bivariate analysis to determine the relationship between the outcome variable 
+#(percentage of detected periodontal disease) and predictor variable (smoker status)
+peri.smoke<-lm(percent.peri.detected~smoker.status,
+                data=periodontal.data)
+
+#Summarizes bivariate analysis data of detected periodontal disease and smoker status
+summary(peri.smoke)
+#
+confint(peri.smoke)
+
+#Organizes output of bivariate analysis
+modelsummary(peri.smoke,statistic="p.value")
+```
+
+According to the bivariate analysis, ...
 
 placeholder
 
 ```{r}
-#bivariate analysis
+#Multivariate analysis
+
+#Runs a multivariate analysis of detected periodontal disease, smoker status, and age of participant
+periodontal.age<-lm(percent.peri.detected~smoker.status+age,
+                    data=periodontal.data)
+summary(periodontal.age)
+
+#Runs a multivariate analysis of detected periodontal disease, smoker status, and gender of participant
+periodontal.gender<-lm(percent.peri.detected~smoker.status+gender,
+                           data=periodontal.data)
+summary(periodontal.gender)
+
+#Runs a multivariate analysis of detected periodontal disease, smoker status, and education level of participant
+periodontal.education<-lm(percent.peri.detected~smoker.status+education,
+                           data=periodontal.data)
+summary(periodontal.education)
+
+#Runs a multivariate analysis of detected periodontal disease, smoker status, and age, gender, and education level of participant
+periodontal.all<-lm(percent.peri.detected~smoker.status+age+gender+education,data=periodontal.data)
+summary(periodontal.all)
 ```
 
-placeholder
-
-```{r}
-#multivariate analysis
-```
+### Maps
 
 placeholder
 
 ```{r}
 #here is a map
+#Customizes aspects of a plot
+my_theme <- function() {
+  theme_minimal() +                                  
+    theme(axis.line = element_blank(),                 
+          axis.text = element_blank(),                 
+          axis.title = element_blank(),
+          panel.grid = element_line(color = "white"),  
+          legend.key.size = unit(0.8, "cm"),          
+          legend.text = element_text(size = 7),       
+          legend.title = element_text(size = 7),
+          plot.title = element_text(size = 12))      
+}
+
+myPalette<-colorRampPalette(brewer.pal(9,"YlOrRd"))
+
+prev.max.2014<-max(philly.2014$CSMOKING_CrudePrev)
+prev.min.2014<-min(philly.2014$CSMOKING_CrudePrev)
+
+ggplot()+
+  geom_sf(data=philly.2014,lwd=0,aes(fill=CSMOKING_CrudePrev))+
+  ggtitle("Smoking Prevalence in Philadelphia in 2014")+
+  scale_fill_gradientn(name="Smoking Prevalence (%)",colours=myPalette(100),limit=range(prev.max.2014,prev.min.2014))+
+  my_theme()
+```
+
+```{r}
+#Static map
+prev.max.2017<-max(philly.2017$CSMOKING_CrudePrev)
+prev.min.2017<-min(philly.2017$CSMOKING_CrudePrev)
+
+ggplot()+
+  geom_sf(data=philly.2017,lwd=0,aes(fill=CSMOKING_CrudePrev))+
+  ggtitle("Smoking Prevalence in Philadelphia in 2017")+
+  scale_fill_gradientn(name="Smoking Prevalence (%)",colours=myPalette(100),limit=range(prev.max.2017,prev.min.2017))+
+  my_theme()
+```
+
+Based on the choropleth maps, it shows that the smoking prevalence is concentrated in the North and West Philadelphia areas for both 2014 and 2017. A slightly noticeable difference is observed in the 2017 map, particularly with the West Philadelphia area, ...
+
+```{r}
+#Leaflet map
+
+#Bins continuous variables into an ordinal color scale appropriate for our data
+palette.map<-colorNumeric(
+  palette=c("green","yellow","red"),
+  domain=philly.2017$smoke.prevalence.change
+)
+
+#Creates a pop-up message containing county name, state name, and obesity rate change as a percentage
+pu.message<-paste0("<br>Change in Smoking Prevalence (2014-2017): ",
+                   philly.2017$smoke.prevalence.change,
+                   "%")
+
+#Creates an interactive choropleth map of the obesity rate change in each U.S. county
+leaflet(philly.2017) |>
+  addPolygons(stroke=F,                       #Removes polygon borders
+              fillColor=~palette.map(philly.2017$smoke.prevalence.change), 
+              fillOpacity=0.7,                #Increases opacity
+              smoothFactor=0.5,               #Increases resolution
+              popup=pu.message) |>            #Adds pop-up message
+  addLegend("bottomright",                    #Places legend in designated location
+            pal=palette.map,                   #Palette function
+            values=~smoke.prevalence.change,  #Variable to pass palette function
+            title="Smoking Prevalence Change (%)",  #Title of legend
+            opacity=1) |>                     #Legend opacity
+  addScaleBar()                               #Adds distance scale
 ```
 
 placeholder
@@ -288,15 +396,3 @@ This the conclusion. The @sec-results can be invoked here.
 \[3\] <https://www.cdc.gov/tobacco/about/index.html> 
 
 \[4\] Philadelphia Department of Public Health (2025). Tobacco Product Trends in Philadelphia. <https://www.phila.gov/media/20250114150429/CHARTe9v2a_Tobacco-Trends.pdf>
-
-\[5\]
-
-\[6\]
-
-\[7\]
-
-\[8\]
-
-\[9\]
-
-\[10\]
