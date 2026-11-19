@@ -1,19 +1,16 @@
-# BMIN5030 Final Project
+# Danny Tran - BMIN5030 Final Project (Fall 2026)
 
-This repository contains templates for the final written report and GitHub repository. Follow the instructions below to clone this repository, and then turn in your final project's code via a pull request to this repository.
+The aim of this project is to determine if smoking is associated with causing periodontal disease among adults. This will be done through R.
 
-1. To start, **fork** this BMIN503_Final_Project repository.
-1. **Clone** the forked repository to your computer.
-1. Modify the files provided, add your own, and **commit** changes to complete your final project.
-1. **Push**/sync the changes up to your GitHub account.
-1. Create a **pull request** on this, the original BMIN503_Final_Project, repository to turn in your final project.
+The repository will contain the following important files:
+- Tran_BMIN5030_FinalProject_Fall26.qmd: 
+The main file containing the code for determining if this association is possible
 
+- 500Cities_2014_CensusTractData.csv 
+Data file that contains various health measurements, including smoking prevalence data for 2014 census tract
 
-Follow the instructions [here][forking] if you are unsure what the above steps mean.
+- 500Cities_2017_CensusTractData.csv
+Data file that contains various health measurements, including smoking prevalence data for 2017 census tract
 
-DUE DATE FOR FINAL VERSION: 12/18/25 11:59PM EST. This is a hard deadline. Turn in whatever you have by this date.
-
-
-<!-- Links -->
-[forking]: https://guides.github.com/activities/forking/
+The two datasets will read into R using the raw GitHub link to aid with the data analysis.
 
