@@ -63,7 +63,7 @@ library(tigris)
 options(tigris_use_cache=T)
 ```
 
-#### Periodontal Data Processing
+#### Processing of Periodontal-Smoking Data
 
 First, the primary dataset will be loaded into a variable through a function called "Periodontal_df."
 
@@ -83,8 +83,8 @@ periodontal.data<-rename(periodontal.data, #Renames variables to provide more co
                          gender=female,
                          race=black,
                          education=educf,
-                         peri.detected=either,  #Number of detected periondontal disease measurements
-                         peri.not.detected=neither, #No detected periodontal disease measurement
+                         peri.detected=either,  #Counted number of detected periondontal disease measurements per participant
+                         peri.not.detected=neither, #Counted number of no detected periodontal disease measurement per participant
                          percent.peri.detected=pcteither,
                          smoker.status=z,
                          pair=mset) |>
@@ -106,11 +106,11 @@ periodontal.data<-rename(periodontal.data, #Renames variables to provide more co
   mutate(smoker.status=factor(smoker.status,levels=c(1,0),  
                               labels=c("Smoker","Non-Smoker")))
 
-#Prints dataset to view modifications
+#Previews dataset to view modifications
 head(periodontal.data)
 ```
 
-#### Census Tract Data Loading, Processing, and Consolidation
+#### Upload of Census Tract Data and Consolidation with Periodontal-Smoking Data
 
 For the 2014 and 2017 census-tract data, it will be loaded in through a GitHub link from the data uploaded onto the repository. The data contains a lot of unnecessary data and will have to be filtered to contain data on smoking prevalence ("CSMOKING_CrudePrev") only in the city of Philadelphia. Census tract data such as FIPS code ("TractFIPS") will also be used for selected.
 
@@ -120,7 +120,7 @@ The "tracts" function from the `tigris` package is utilized to select and load i
 #Reads 500Cities_2014_CensusTractData.csv file
 smoking.data.2014<-read_csv("https://raw.githubusercontent.com/DannyTran0/BMIN5030_Final_Project/refs/heads/master/500Cities_2014_CensusTractData.csv")
 
-#Visualizes data
+#Previews data
 head(smoking.data.2014)
 
 #Filters and selects relevant variables
@@ -154,10 +154,9 @@ philly.2014<-philly.tract.2014 |>
              by=c("GEOID"="TractFIPS"))
 
 #Checks that everything has been correctly done
-head(philly.2014)
-dim(philly.2014)
-
-class(philly.2014)
+head(philly.2014)   #Sees first 6 rows
+dim(philly.2014)    #Checks dimensions of dataset
+class(philly.2014)  #Checks class classification for each variable
 ```
 
 ```{r}
@@ -194,9 +193,10 @@ philly.2017<-philly.tract.2017 |>
 #Checks that everything has been correctly done
 head(philly.2017)
 dim(philly.2017)
+class(philly.2017)
 ```
 
-Smoking prevalence data from 2014 and 2017 is taken and consolidated into its own table. A new column is added into the table in "philly.smoke.data.consolidation.2017" to show the change in smoking prevalence between 2014 and 2017.
+Smoking prevalence data from 2014 and 2017 is taken and consolidated into its own table. A new column is added into the table in "philly.smoke.data.consolidation.2017" to show the change in smoking prevalence between 2014 and 2017. This is done by subtracting the smoking prevalence smoking data from 2017 (the latest data) with the one from 2014 (the older data).
 
 ```{r}
 #Stores smoking prevalance data
@@ -210,24 +210,11 @@ philly.2017<-philly.2017 |>
 
 ## Results {#sec-results}
 
-Describe your results and include relevant tables, plots, and code/comments used to obtain them. You may refer to the @sec-methods as needed. End with a brief conclusion of your findings related to the question you set out to address. You can include references if you'd like, but this is not required.
+### Association Between Smoking and Periodontal Disease
 
-Written below are currently initial ideas of what I will be doing (please stand by)
+#### Visualization of Data
 
-```{r}
-#Visual graphs
-#Bivariate analysis then multivariate analysis
-#Static choropleth map on smoking in Philadelphia
-#Interactive map?
-
-#Paired data, so maybe checking if data is paired or unpaired? (Unknown idea to work with)
-```
-
-### Primary Dataset
-
-#### Data Visualization
-
-placeholder
+To understand whether there are other factors at play that could cause a participant to smoke with the potential to develop periodontal disease, it is important to first look at what the data shows. Various demographic variables which includes their age, gender, race, and education is plotted as a bar graph relative to whether they are a current smoker or a non-smoker. Filtering was done with the age data as some of it was missing.
 
 ```{r}
 #Selects the relevant variables
@@ -251,6 +238,15 @@ ggplot(smoker.age,aes(x=age,fill=smoker.status))+
   theme_bw()+
   theme(plot.title=element_text(hjust=0.5))
 
+#Creates a bar plot visualizing a participant's smoker status based on race
+smoker.race<-select(periodontal.data,race,smoker.status)
+#Creates a bar plot visualizing a participant's smoker status based on race
+ggplot(smoker.race,aes(x=race,fill=smoker.status))+
+  geom_bar()+
+  labs(x="Race",y="Number of Participants",title="Smoker status of participant based on race")+
+  theme_bw()+
+  theme(plot.title=element_text(hjust=0.5))
+
 #Creates a bar plot visualizing a participant's smoker status based on education
 smoker.education<-select(periodontal.data,education,smoker.status)
 #Creates a bar plot visualizing a participant's smoker status based on their education
@@ -261,7 +257,31 @@ ggplot(smoker.education,aes(x=education,fill=smoker.status))+
   theme(plot.title=element_text(hjust=0.5))
 ```
 
-#### Bivariate and Multivariate Analysis between ...
+Visually speaking, all of the bar plots appears to shows an approximate even split between current smokers and non-smokers for each of the demographic variables. This falls in line with how the data was initially structured by the CDC by pairing a smoker and non-smoker together while preparing for analysis. For each of the demographic variables, more men were found to be smokers compared to women. In terms of age, a decrease with the number of smokers and non-smokers with age were observed. For race, participants who were labelled as "Other" vastly outnumbered African American participants 3 to 1 in terms of smoking status. Lastly, there shows an increase in the number of smokers in terms of education for the most part with a sharp decrease with participants who have gone to college.
+
+Next, the number of detected and non-detected periodontal disease measurements were plotted on a violin plot with the participant's smoker status. The measurement for determining if periodontal disease is detected is through the 6-site periodontal charting. The process involves a thin dental probe measuring the depth of gum pockets around each tooth and if it measures to be approximately 4 mm or longer, that indicates the onset of periodontal disease \[5\].
+
+```{r}
+#Creates a violin plot on the counted number of periodontal disease measurements relative to the participant's smoker status
+ggplot(periodontal.data,aes(x=smoker.status,y=peri.detected))+
+  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75))+
+  labs(x="Smoker Status",y="# of detected P.D.",title="Distribution of counted periodontal disease measurements based on smoker status")+
+  theme_bw()
+
+#Creates a violin plot on the counted number of non-periodontal disease measurements relative to the participant's smoker status
+ggplot(periodontal.data,aes(x=smoker.status,y=peri.not.detected))+
+  geom_violin(draw_quantiles=c(0.25, 0.5, 0.75))+
+  labs(x="Smoker Status",y="# of no P.D. detected",title="Distribution of counted non-periodontal disease measurements based on smoker status")+
+  theme_bw()
+```
+
+From the violin plot for the count on periodontal disease measurements, it shows a large distribution of data points near 0 and narrows quickly for non-smokers, indicating little to no periodontal disease being detected. Smokers have a different distribution with a more narrower distribution at or near 0, but thickens moving upwards. This indicates that smokers were more susceptible to being diagnosed with periodontal disease.
+
+A similar case of distribution can be said for both smokers and non-smokers with the count of no periodontal disease being measured. For smokers, the violin shape is mirrored, more thicker near the bottom, and closer to 0, showing that the number of healthy teeth is diminished and periodontal disease has progressed to large number of teeth. The distribution for non-smokers is quite different with the distribution congregating near the top of the graph. There are some thickness moving towards the bottom, indicating periodontal disease may have been discovered.
+
+#### Bi-/Multivariate Analysis
+
+A bivariate analysis (linear model) is conducted with smoker status as the predictor variable and the percentage of periodontal disease detected as the outcome variable. Though there is data that counts the number of detected and undetected periodontal disease measurements, using the percentage of periodontal disease detected was better as it describes how much of a participant's set of teeth has been affected by the disease compared to the count of the diseased and healthy points of the teeth.
 
 ```{r}
 #Bivariable Analysis
@@ -273,46 +293,56 @@ peri.smoke<-lm(percent.peri.detected~smoker.status,
 
 #Summarizes bivariate analysis data of detected periodontal disease and smoker status
 summary(peri.smoke)
-#
-confint(peri.smoke)
-
-#Organizes output of bivariate analysis
-modelsummary(peri.smoke,statistic="p.value")
 ```
 
-According to the bivariate analysis, ...
+According to the bivariate analysis, it shows that there is an association with a participant's smoker status in affecting the percentage of periodontal disease being detected with a p-value p\<2e-16. This indicates that the possibility of this association being due to change is very small and that participants who currently smoke do have an influence on causing periodontal disease.
 
-placeholder
+Moving from the bivariate analysis, multivariate analysis was also conducted with additional predictor variables added (age, gender, race, and education).
 
 ```{r}
 #Multivariate analysis
 
-#Runs a multivariate analysis of detected periodontal disease, smoker status, and age of participant
+#Runs a multivariate analysis of detected periodontal disease, smoker status, and age
 periodontal.age<-lm(percent.peri.detected~smoker.status+age,
                     data=periodontal.data)
+
 summary(periodontal.age)
 
-#Runs a multivariate analysis of detected periodontal disease, smoker status, and gender of participant
+#Runs a multivariate analysis of detected periodontal disease, smoker status, and gender
 periodontal.gender<-lm(percent.peri.detected~smoker.status+gender,
                            data=periodontal.data)
+
 summary(periodontal.gender)
 
-#Runs a multivariate analysis of detected periodontal disease, smoker status, and education level of participant
+#Runs a multivariate analysis of detected periodontal disease, smoker status, and race
+periodontal.race<-lm(percent.peri.detected~smoker.status+race,
+                          data=periodontal.data)
+
+summary(periodontal.race)
+
+#Runs a multivariate analysis of detected periodontal disease, smoker status, and education level
 periodontal.education<-lm(percent.peri.detected~smoker.status+education,
                            data=periodontal.data)
+
 summary(periodontal.education)
 
-#Runs a multivariate analysis of detected periodontal disease, smoker status, and age, gender, and education level of participant
-periodontal.all<-lm(percent.peri.detected~smoker.status+age+gender+education,data=periodontal.data)
+#Runs a multivariate analysis of detected periodontal disease with smoker status, age, gender, race, and education level
+periodontal.all<-lm(percent.peri.detected~smoker.status+age+gender+race+education,
+                    data=periodontal.data)
+
 summary(periodontal.all)
+modelsummary(periodontal.all,statistic="p.value")
 ```
 
-### Maps
+Most of the predictor variables were found to be significantly associated with smoker status influencing the onset of periodontal disease among participants. Only a few subgroups of the education variable were found with a non-significant p-value (QED/High School, Some College, and College), indicating that participants with those education levels do not have an effect on the association between a participant's smoker status and periodontal disease.
 
-placeholder
+### Exploring Changes to Smoking Prevalence
+
+Using 2014 and 2017 census tract data, two choropleth and a leaflet map were created to visualize the prevalence of smoking in Philadelphia and any changes that occurred in a three-year period, respectively.
 
 ```{r}
-#here is a map
+#Choropleth Map
+
 #Customizes aspects of a plot
 my_theme <- function() {
   theme_minimal() +                                  
@@ -326,11 +356,14 @@ my_theme <- function() {
           plot.title = element_text(size = 12))      
 }
 
+#Creates a palette
 myPalette<-colorRampPalette(brewer.pal(9,"YlOrRd"))
 
+#Finds the maximum and minimum from the 2014 smoking prevalence data
 prev.max.2014<-max(philly.2014$CSMOKING_CrudePrev)
 prev.min.2014<-min(philly.2014$CSMOKING_CrudePrev)
 
+#Creates a choropleth map of the smoking prevalence in Philadelphia from 2014
 ggplot()+
   geom_sf(data=philly.2014,lwd=0,aes(fill=CSMOKING_CrudePrev))+
   ggtitle("Smoking Prevalence in Philadelphia in 2014")+
@@ -339,10 +372,13 @@ ggplot()+
 ```
 
 ```{r}
-#Static map
+#Choropleth map
+
+#Finds the maximum and minimum from the 2017 smoking prevalence data
 prev.max.2017<-max(philly.2017$CSMOKING_CrudePrev)
 prev.min.2017<-min(philly.2017$CSMOKING_CrudePrev)
 
+#Creates a choropleth map of the smoking prevalence in Philadelphia from 2017
 ggplot()+
   geom_sf(data=philly.2017,lwd=0,aes(fill=CSMOKING_CrudePrev))+
   ggtitle("Smoking Prevalence in Philadelphia in 2017")+
@@ -350,7 +386,7 @@ ggplot()+
   my_theme()
 ```
 
-Based on the choropleth maps, it shows that the smoking prevalence is concentrated in the North and West Philadelphia areas for both 2014 and 2017. A slightly noticeable difference is observed in the 2017 map, particularly with the West Philadelphia area, ...
+Based on the choropleth maps, it shows that the high smoking prevalence is concentrated in the North and West Philadelphia areas for both 2014 and 2017. A very slight change is observed in the 2017 map, particularly with the West Philadelphia area, where there was a decrease in the smoking prevalence, but not to a great extent. In comparison, a low smoking prevalence is found in the Center City and Northwest area of Philadelphia for both years. This indicates that people living in those areas are less likely to smoke.
 
 ```{r}
 #Leaflet map
@@ -362,7 +398,12 @@ palette.map<-colorNumeric(
 )
 
 #Creates a pop-up message containing county name, state name, and obesity rate change as a percentage
-pu.message<-paste0("<br>Change in Smoking Prevalence (2014-2017): ",
+pu.message<-paste0(philly.2017$PlaceName,
+                   ", ",
+                   philly.2017$StateAbbr,
+                   "<br> Tract FIPS Code: ",
+                   philly.2017$GEOID,
+                   "<br>Change in Smoking Prevalence (2014-2017): ",
                    philly.2017$smoke.prevalence.change,
                    "%")
 
@@ -381,11 +422,21 @@ leaflet(philly.2017) |>
   addScaleBar()                               #Adds distance scale
 ```
 
-placeholder
+For the most part, there was a moderate to high drop in the smoking prevalence throughout the city which are shown in yellow and green, respectively, for part of Northwest, West, and South Philadelphia. However, there are patches of orange and red mainly in parts of North and Northeast Philadelphia, indicating an increase the number of people turning to smoking.
 
-## Conclusion
+### Limitations
 
-This the conclusion. The @sec-results can be invoked here.
+It is important to realize that all of the data used for this project is quite old, being almost or over a decade old. Therefore, conclusions made will likely be outdated or not representative of the current public health situations on smoking usage that Philadelphia may be experiencing.
+
+Despite the periodontal-smoking dataset providing the relevant data to conduct this project, one particular result that was not properly conducted was visualizing and doing a multivariate analysis with race as a predictor variable on the association of smoking with periodontal disease detection. This is due to how the data from the R package `ForCausality` were labelled. Specifically, any race other than "African American" was labeled as "Other." It limits the conclusions that could be made with analyzing race as a predictor variable as the outcomes would be skewed and not representative of the general population.
+
+When creating the choropleth and leaflet maps to highlight the smoking prevalence in the city, it was noticed that there were missing areas, specifically areas in South and Northeast Philadelphia. It is possible that the data in those missing areas were not reported, causing the corresponding GEOID codes to be filtered out in the code as a result while the data was processed.
+
+## Conclusion and Future Direction
+
+Smoking can have profound effects on a person's health and the health of those around them. With periodontal disease being a treatable disease, the city of Philadelphia should have public health responses in place to tackle smoking/tobacco use and make efforts to help current smokers get the necessary treatments.
+
+A potential direction this project could works towards is mapping the locations of dental clinics and facilities throughout Philadelphia to compare with the smoking prevalence levels. Though no public dataset was found on the number of operating dental clinics and their location in Philadelphia, it would be beneficial to find where they are lacking. In turn, the city government and local leaders could make plans to address the problems of smoking and ensure proper care of the smoker's oral health for years to come.
 
 ## References
 
@@ -396,3 +447,5 @@ This the conclusion. The @sec-results can be invoked here.
 \[3\] <https://www.cdc.gov/tobacco/about/index.html> 
 
 \[4\] Philadelphia Department of Public Health (2025). Tobacco Product Trends in Philadelphia. <https://www.phila.gov/media/20250114150429/CHARTe9v2a_Tobacco-Trends.pdf>
+
+\[5\] Guo, Y., Ge, Z., Ma, R., Hou, J., Li, G. (2016). A six-site method for the evaluation of periodontal bone loss in cone-beam CT images. DentoMaxilloFacial Radiology, 45(1). <https://doi.org/https://doi.org/10.1259/dmfr.20150265>
