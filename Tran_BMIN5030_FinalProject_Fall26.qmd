@@ -1,5 +1,5 @@
 ---
-title: "TBD"
+title: "A biomedical analysis on the impact of smoking as a cause of periodontal disease"
 subtitle: "BMIN5030 Final Project"
 author: "Danny Tran"
 format: html
@@ -24,7 +24,7 @@ Periodontal disease is a broad condition where bacterial infections and/or infla
 
 Despite trends in the smoking rate decreasing nationally between 2012-2022 among adults, Philadelphia has consistently remained above the national rate \[[4](https://www.phila.gov/media/20250114150429/CHARTe9v2a_Tobacco-Trends.pdf)\]. Public health support and resources are needed to educate the residents on the dangers of smoking. In turn, smokers would be able to find the help needed to quit smoking.
 
-This project aims to explore the potential association between smoking and periodontal disease measurements among adults. In particular, it will explore how various demographic factors, income, and the number of cigarettes smoked per day is correlated with causing periodontal disease. This is where the National Health and Nutrition Examination Survey (NHANES) data for 2011-12 comes into play to aid with the analysis. Additionally, it will examine tobacco use in Philadelphia to provide context on the local level with public health.
+This project aims to explore the potential association between smoking and periodontal disease measurements among adults. In particular, it will explore how various demographic factors and the number of cigarettes smoked per day is correlated with causing periodontal disease. This is where the National Health and Nutrition Examination Survey (NHANES) data for 2011-12 comes into play to aid with the analysis. Additionally, it will examine tobacco use in Philadelphia to provide context on the local level with public health.
 
 The project is interdisciplinary as it connects various fields on the issue of smoking as a cause for periodontal disease, including dentistry, biomedical data science, public health, behavioral psychology, and sociology. As such, reaching out to experts in these fields is essential to understand the problem. The following experts were consulted:
 
@@ -279,6 +279,27 @@ From the violin plot for the count on periodontal disease measurements, it shows
 
 A similar case of distribution can be said for both smokers and non-smokers with the count of no periodontal disease being measured. For smokers, the violin shape is mirrored, more thicker near the bottom, and closer to 0, showing that the number of healthy teeth is diminished and periodontal disease has progressed to large number of teeth. The distribution for non-smokers is quite different with the distribution congregating near the top of the graph. There are some thickness moving towards the bottom, indicating periodontal disease may have been discovered.
 
+Lastly with participants who are current smokers, the number of cigarettes they use per day will be plotted on a scatterplot relative the percentage of detected periodontal disease.
+
+```{r}
+#Periodontal-smoking data stored in new variable and filtered to contain only data on participants who are current smokers
+peri.filter<-Periodontal_df |>
+  rename(smoker.status=z,
+         percent.peri.detected=pcteither) |>
+  filter(smoker.status==1) #1 indicates that participant is a current smoker
+
+#Creates a scatterplot to compare between the percentage of periodontal disease that was detected based on the approximate number of cigarettes the participants smoked per day
+ggplot(peri.filter,aes(x=percent.peri.detected,y=cigsperday))+
+  geom_point()+
+  labs(x="Percentage of peridontal disease detected [%]",
+       y="Approximate number of cigarettes per day",
+       title="Percentage of peridontal disease detected based on the number of cigarettes used")+
+  theme_bw()+
+  theme(plot.title=element_text(hjust=0.5))
+```
+
+For the most part, a relatively large distribution of data points are located near the bottom of the plot, but have varying degrees of how much of the disease has affected their set of teeth. Surprisingly, there are a few located far from this distribution in terms of the number of cigarettes being used per day with least 3 using more than 60. However, this does not say much on whether smoking too many cigarettes daily would cause the onset of the disease from happening.
+
 #### Bi-/Multivariate Analysis
 
 A bivariate analysis (linear model) is conducted with smoker status as the predictor variable and the percentage of periodontal disease detected as the outcome variable. Though there is data that counts the number of detected and undetected periodontal disease measurements, using the percentage of periodontal disease detected was better as it describes how much of a participant's set of teeth has been affected by the disease compared to the count of the diseased and healthy points of the teeth.
@@ -301,37 +322,11 @@ Moving from the bivariate analysis, multivariate analysis was also conducted wit
 
 ```{r}
 #Multivariate analysis
-
-#Runs a multivariate analysis of detected periodontal disease, smoker status, and age
-periodontal.age<-lm(percent.peri.detected~smoker.status+age,
-                    data=periodontal.data)
-
-summary(periodontal.age)
-
-#Runs a multivariate analysis of detected periodontal disease, smoker status, and gender
-periodontal.gender<-lm(percent.peri.detected~smoker.status+gender,
-                           data=periodontal.data)
-
-summary(periodontal.gender)
-
-#Runs a multivariate analysis of detected periodontal disease, smoker status, and race
-periodontal.race<-lm(percent.peri.detected~smoker.status+race,
-                          data=periodontal.data)
-
-summary(periodontal.race)
-
-#Runs a multivariate analysis of detected periodontal disease, smoker status, and education level
-periodontal.education<-lm(percent.peri.detected~smoker.status+education,
-                           data=periodontal.data)
-
-summary(periodontal.education)
-
 #Runs a multivariate analysis of detected periodontal disease with smoker status, age, gender, race, and education level
-periodontal.all<-lm(percent.peri.detected~smoker.status+age+gender+race+education,
-                    data=periodontal.data)
+periodontal.all<-lm(percent.peri.detected~smoker.status+age+gender+race+education,data=periodontal.data)
 
+#Summarizes results of multivariate analysis
 summary(periodontal.all)
-modelsummary(periodontal.all,statistic="p.value")
 ```
 
 Most of the predictor variables were found to be significantly associated with smoker status influencing the onset of periodontal disease among participants. Only a few subgroups of the education variable were found with a non-significant p-value (QED/High School, Some College, and College), indicating that participants with those education levels do not have an effect on the association between a participant's smoker status and periodontal disease.
@@ -434,9 +429,11 @@ When creating the choropleth and leaflet maps to highlight the smoking prevalenc
 
 ## Conclusion and Future Direction
 
-Smoking can have profound effects on a person's health and the health of those around them. With periodontal disease being a treatable disease, the city of Philadelphia should have public health responses in place to tackle smoking/tobacco use and make efforts to help current smokers get the necessary treatments.
+Smoking could have profound effects on a person's health and the health of those around them. However, that alone can not fully show if it is one of the primary causes of peridontal disease. But with it being a treatable disease, the city of Philadelphia should have public health responses in place to tackle smoking/tobacco use and make efforts to help current smokers get the necessary treatments.
 
 A potential direction this project could works towards is mapping the locations of dental clinics and facilities throughout Philadelphia to compare with the smoking prevalence levels. Though no public dataset was found on the number of operating dental clinics and their location in Philadelphia, it would be beneficial to find where they are lacking. In turn, the city government and local leaders could make plans to address the problems of smoking and ensure proper care of the smoker's oral health for years to come.
+
+Another potential direction would be to include the usage of smokeless cigarettes and e-cigarettes in the data. They are also as bad in terms of causing number health problems like periodontal disease. Including them into the analysis would further highlight the goals of this project on how smoking of any kind can bring harm to the users' health and the health of those around them.
 
 ## References
 
